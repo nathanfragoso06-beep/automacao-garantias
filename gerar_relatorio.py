@@ -1,128 +1,64 @@
-# Script de Automação de Relatórios Executivos - MVP
-import os
+import pandas as pd
 import matplotlib.pyplot as plt
 from pptx import Presentation
 from pptx.util import Inches, Pt
-from pptx.dml.color import RGBColor
 
-def gerar_grafico_redes():
-    # Dados corporativos simulados por Rede (Insuficiência Financeira)
-    redes = ['AGRO SP', 'SUL/MS/RO', 'SP/N/NO', 'AGRO A3', 'ESPECIAIS', 'AGRO SUL', 'MG/ES/RJ', 'AGRO A1']
-    valores = [264.59, 236.23, 197.08, 145.09, 122.56, 74.30, 52.99, 5.98]
+def gerar_relatorio_com_grafico():
+    print("Iniciando o processamento e geração de gráficos da Loja Hawara...")
     
-    fig, ax = plt.subplots(figsize=(7, 4.2))
+    # 1. Base de dados simulada de vendas e estoque
+    dados = {
+        'Categoria': ['Camisetas', 'Calças', 'Jaquetas', 'Vestidos', 'Acessórios'],
+        'Estoque_Atual': [150, 80, 45, 60, 200],
+        'Vendas_Mes': [320, 140, 90, 110, 410]
+    }
     
-    # Cores no padrão corporativo (Laranja/Vermelho Santander)
-    barras = ax.barh(redes, valores, color='#E63946')
-    ax.invert_yaxis()  # Inverte para o maior ficar no topo
+    df = pd.DataFrame(dados)
     
-    # Remove bordas desnecessárias
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_color('#CCCCCC')
-    ax.spines['bottom'].set_color('#CCCCCC')
+    # 2. Gerar gráfico profissional com Matplotlib
+    plt.figure(figsize=(7, 4.5))
+    x = range(len(df['Categoria']))
+    largura = 0.35
     
-    ax.set_title('Insuficiência por Rede (Mi R$)', fontsize=12, fontweight='bold', color='#333333', pad=10)
-    ax.tick_params(axis='x', labelsize=9)
-    ax.tick_params(axis='y', labelsize=9)
+    plt.bar([p - largura/2 for p in x], df['Vendas_Mes'], largura, label='Vendas do Mês', color='#1f77b4')
+    plt.bar([p + largura/2 for p in x], df['Estoque_Atual'], largura, label='Estoque Atual', color='#ff7f0e')
     
-    # Adiciona os rótulos de valor nas barras
-    for barra in barras:
-        width = barra.get_width()
-        ax.text(width + 3, barra.get_y() + barra.get_height()/2, f'{width:.2f} Mi', 
-                va='center', ha='left', fontsize=8, color='#333333', fontweight='bold')
-
+    plt.xlabel('Categorias de Vestuário', fontweight='bold')
+    plt.ylabel('Unidades', fontweight='bold')
+    plt.title('Desempenho Operacional: Vendas vs. Estoque - Loja Hawara', fontweight='bold', fontsize=12)
+    plt.xticks(x, df['Categoria'])
+    plt.legend()
     plt.tight_layout()
-    caminho_img = 'grafico_rede_temp.png'
-    plt.savefig(caminho_img, dpi=300, bbox_inches='tight')
+    
+    # Salva o gráfico como imagem temporária
+    caminho_grafico = 'grafico_desempenho.png'
+    plt.savefig(caminho_grafico, dpi=300)
     plt.close()
-    return caminho_img
-
-def criar_relatorio_executivo():
-    # Define o diretório atual do script
-    diretorio_atual = os.path.dirname(os.path.abspath(__file__))
+    print("Gráfico gerado e salvo com sucesso.")
     
+    # 3. Criar a apresentação em PowerPoint e inserir o gráfico
     prs = Presentation()
-    prs.slide_width = Inches(13.333)
-    prs.slide_height = Inches(7.5)
+    slide_layout = prs.slide_layouts[6] # Layout em branco para total liberdade visual
+    slide = prs.slides.add_slide(slide_layout)
     
-    blank_layout = prs.slide_layouts[6]
-    segmentos = ["B1", "B2", "BD", "GIU", "Large", "Middle"]
+    # Título principal no topo do slide (utilizando Pt(24) corretamente)
+    txBox = slide.shapes.add_textbox(Inches(0.8), Inches(0.5), Inches(8.5), Inches(0.8))
+    tf = txBox.text_frame
+    p = tf.paragraphs[0]
+    p.text = "Relatório Executivo Mensal — Loja Hawara"
+    p.font.size = Pt(24)
+    p.font.bold = True
     
-    img_grafico = gerar_grafico_redes()
+    # Inserir a imagem do gráfico gerado pelo Python no slide
+    left = Inches(0.8)
+    top = Inches(1.5)
+    width = Inches(7.5)
+    slide.shapes.add_picture(caminho_grafico, left, top, width=width)
     
-    for seg in segmentos:
-        slide = prs.slides.add_slide(blank_layout)
-        
-        # --- CABEÇALHO ---
-        title_box = slide.shapes.add_textbox(Inches(0.6), Inches(0.3), Inches(12.1), Inches(0.6))
-        tf = title_box.text_frame
-        p = tf.paragraphs[0]
-        p.text = f"Insuficiência Financeira - Segmento {seg}"
-        p.font.bold = True
-        p.font.size = Pt(24)
-        p.font.color.rgb = RGBColor(204, 0, 0) # Vermelho Santander
-        
-        # --- CARDS DE KPIS (TOPO) ---
-        # Valor em Bi
-        kpi1 = slide.shapes.add_textbox(Inches(0.6), Inches(1.0), Inches(3.5), Inches(0.8))
-        kpi1.text_frame.paragraphs[0].text = "R$ 1.42 Bi\nValor Total em Insuficiência"
-        kpi1.text_frame.paragraphs[0].font.bold = True
-        kpi1.text_frame.paragraphs[0].font.size = Pt(13)
-        
-        # Qtd Contratos
-        kpi2 = slide.shapes.add_textbox(Inches(4.5), Inches(1.0), Inches(3.5), Inches(0.8))
-        kpi2.text_frame.paragraphs[0].text = "372\nQtde Contratos"
-        kpi2.text_frame.paragraphs[0].font.bold = True
-        kpi2.text_frame.paragraphs[0].font.size = Pt(13)
-        
-        # Qtd Clientes
-        kpi3 = slide.shapes.add_textbox(Inches(8.4), Inches(1.0), Inches(3.5), Inches(0.8))
-        kpi3.text_frame.paragraphs[0].text = "297\nQtde Clientes / CPFs"
-        kpi3.text_frame.paragraphs[0].font.bold = True
-        kpi3.text_frame.paragraphs[0].font.size = Pt(13)
-        
-        # --- GRÁFICO PRINCIPAL: INSUFICIÊNCIA POR REDE (LADO ESQUERDO) ---
-        slide.shapes.add_picture(img_grafico, Inches(0.6), Inches(2.0), width=Inches(7.0))
-        
-        # --- BLOCOS AUXILIARES (LADO DIREITO) ---
-        # Top 5 Garantias / Concentração
-        box_top5 = slide.shapes.add_textbox(Inches(7.9), Inches(2.0), Inches(4.8), Inches(2.3))
-        tf_t5 = box_top5.text_frame
-        tf_t5.word_wrap = True
-        p_t5 = tf_t5.paragraphs[0]
-        p_t5.text = "Concentração - Top 5 Garantias"
-        p_t5.font.bold = True
-        p_t5.font.size = Pt(13)
-        p_t5_sub = tf_t5.add_paragraph()
-        p_t5_sub.text = "1. Imóveis Comerciais (42%)\n2. Aplicações Financeiras (25%)\n3. Veículos e Frotas (18%)\n4. Equipamentos Industriais (10%)\n5. Outros (5%)"
-        p_t5_sub.font.size = Pt(11)
-        
-        # Faixa de Dias Insuficientes & Status (Regularizados / Pendentes)
-        box_status = slide.shapes.add_textbox(Inches(7.9), Inches(4.6), Inches(4.8), Inches(2.3))
-        tf_st = box_status.text_frame
-        tf_st.word_wrap = True
-        p_st = tf_st.paragraphs[0]
-        p_st.text = "Status & Faixa de Dias (Cruzamento Temporal)"
-        p_st.font.bold = True
-        p_st.font.size = Pt(13)
-        p_st_sub = tf_st.add_paragraph()
-        p_st_sub.text = (
-            "• Chave composta: Agência + Contrato + Garantia\n"
-            "• Operações Regularizadas: Redução no ciclo\n"
-            "• Faixas: 0-30 dias | 31-60 dias | Acima de 60 dias"
-        )
-        p_st_sub.font.size = Pt(11)
-
-    # Salva na mesma pasta do script
-    output_path = os.path.join(diretorio_atual, "Relatorio_Executivo_Garantias_Segmentos.pptx")
-    prs.save(output_path)
-    
-    # Remove imagem temporária
-    if os.path.exists(img_grafico):
-        os.remove(img_grafico)
-        
-    print(f"[SUCESSO] Relatório gerado na mesma pasta: {output_path}")
+    # Salvar o arquivo final do PowerPoint
+    caminho_saida = "relatorio_gerencial_hawara.pptx"
+    prs.save(caminho_saida)
+    print(f"Apresentação executiva gerada com sucesso em: {caminho_saida}")
 
 if __name__ == "__main__":
-    criar_relatorio_executivo()
+    gerar_relatorio_com_grafico()
