@@ -16,3 +16,5 @@ Repositório desenvolvido para o projeto prático da faculdade, contendo a solu�
    Execute o script Python na mesma pasta:
    ```bash
    python gerar_relatorio.py
+## 📊 Saída Esperada
+Geração automática do arquivo `Relatorio_Executivo_Garantias_Segmentos.pptx` com gráficos de barras horizontais por Rede.
