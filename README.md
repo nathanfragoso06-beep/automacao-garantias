@@ -1,7 +1,7 @@
 # Explicação
 # MVP - Automação de Relatório de Insuficiência de Garantias
 
-Repositório desenvolvido para o projeto prático da faculdade, contendo a solução de automação em Python para o processamento de relatórios e geração de apresentações executivas corporativas.
+Repositório desenvolvido para o projeto prático da faculdade unicsul, contendo a solução de automação em Python para o processamento de relatórios e geração de apresentações executivas corporativas.
 
 ## 📁 Estrutura do Repositório
 * `gerar_relatorio.py`: Script principal em Python que realiza a ingestão de dados, cruzamento temporal e geração dos slides executivos `.pptx` com gráficos por rede.
