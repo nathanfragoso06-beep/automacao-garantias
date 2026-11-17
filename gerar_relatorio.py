@@ -1,3 +1,4 @@
+# Script de Automação de Relatórios Executivos - MVP
 import os
 import matplotlib.pyplot as plt
 from pptx import Presentation
