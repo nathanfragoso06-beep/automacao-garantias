@@ -15,9 +15,9 @@ Este projeto consiste em um **Produto Mínimo Viável (MVP)** de automação que
 ## 🛠️ Tecnologias e Bibliotecas Utilizadas
 * **Python 3.x** — Linguagem principal do script de automação.
 * **Pandas** — Manipulação, limpeza, tratamento e agrupamento de dados tabulares.
+* **Matplotlib** — Geração programática de gráficos analíticos e visuais.
 * **Python-PPtx** — Automação e geração programática de slides de apresentação gerencial (.pptx).
 * **OpenPyXL** — Leitura e escrita de arquivos de planilha (`.xlsx`).
-
 ---
 
 ## ⚙️ Arquitetura e Fluxo de Execução
